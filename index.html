@@ -24,72 +24,73 @@
             border: 3px solid #feca57; /* Золотая рамка */
             border-radius: 10px;
             overflow: hidden; /* Скрыть все, что выходит за пределы */
+            margin-left: auto;
+            margin-right: auto;
             margin-bottom: 20px;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
         }
         .reel-pointer {
             position: absolute;
             top: 50%;
-            left: -5px; /* Немного вынести за пределы */
-            right: -5px; /* Немного вынести за пределы */
-            height: 60px; /* Высота одного элемента */
+            left: -5px;
+            right: -5px;
+            height: 60px;
             transform: translateY(-50%);
-            border-top: 3px solid #e67e22; /* Оранжевая линия сверху */
-            border-bottom: 3px solid #e67e22; /* Оранжевая линия снизу */
-            z-index: 5; /* Поверх прокрутки, но под текстом */
-            pointer-events: none; /* Не мешать взаимодействию */
+            border-top: 3px solid #e67e22;
+            border-bottom: 3px solid #e67e22;
+            z-index: 5;
+            pointer-events: none;
         }
 
         .reel {
-            /* Плавный переход для translateY */
             transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .reel-item {
-            height: 60px; /* Высота одного элемента */
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2rem; /* Размер шрифта приза */
+            font-size: 1.2rem;
             font-weight: bold;
-            color: white; /* Единый цвет для всех */
+            color: white;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            border-bottom: 1px solid #40407a; /* Разделитель */
+            border-bottom: 1px solid #40407a;
         }
         .reel-item:last-child {
              border-bottom: none;
         }
 
-        /* Стили кнопок остались прежними */
+        /* Стили кнопок */
         .spin-button {
             background: linear-gradient(180deg, #48dbfb 0%, #1dd1a1 100%);
             transition: background 0.3s ease, transform 0.1s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
-        .spin-button:hover {
-            background: linear-gradient(180deg, #1dd1a1 0%, #48dbfb 100%);
+        .spin-button:hover { background: linear-gradient(180deg, #1dd1a1 0%, #48dbfb 100%); }
+        .spin-button:active { transform: translateY(2px); box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2); }
+        .spin-button:disabled { background: #999; cursor: not-allowed; opacity: 0.7; box-shadow: none; }
+
+        .bonus-button { /* Кнопка "Забрать Чек" */
+            background: linear-gradient(180deg, #feca57 0%, #ff9f43 100%);
+            transition: background 0.3s ease, transform 0.1s ease, opacity 0.3s ease; /* Добавлен переход для opacity */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            color: #333; /* Темный текст для контраста */
         }
-        .spin-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        .bonus-button:hover:not(:disabled) { /* Стиль ховера только для активной кнопки */
+             background: linear-gradient(180deg, #ff9f43 0%, #feca57 100%);
         }
-        .spin-button:disabled {
-            background: #999;
+        .bonus-button:active:not(:disabled) { /* Стиль нажатия только для активной кнопки */
+             transform: translateY(2px);
+             box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        }
+         /* Стиль для неактивной кнопки "Забрать Чек" */
+        .bonus-button:disabled {
+            background: #a0a0a0; /* Серый фон */
+            color: #666; /* Темно-серый текст */
             cursor: not-allowed;
             opacity: 0.7;
             box-shadow: none;
-        }
-         .bonus-button {
-            background: linear-gradient(180deg, #feca57 0%, #ff9f43 100%);
-            transition: background 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        .bonus-button:hover {
-            background: linear-gradient(180deg, #ff9f43 0%, #feca57 100%);
-        }
-         .bonus-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -97,7 +98,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="bg-gray-800 p-8 rounded-lg shadow-xl text-center max-w-xs w-full">
+    <div class="main-container bg-gray-800 p-8 rounded-lg shadow-xl text-center max-w-xs w-full">
         <h1 class="text-2xl font-bold text-yellow-400 mb-4">Крипто-барабан</h1>
 
         <div class="reel-container-wrapper">
@@ -110,198 +111,211 @@
             КРУТИТЬ
         </button>
 
-        <p id="result-message" class="text-yellow-300 font-semibold text-lg mb-4 h-6"></p>
-
-        <a href="#" target="_blank" id="bonus-link" class="hidden">
-            <button id="bonus-button" class="bonus-button text-gray-800 font-bold py-3 px-8 rounded-lg text-xl w-full">
+        <p id="result-message" class="text-yellow-300 font-semibold text-lg mb-4 min-h-[3rem]"></p> <a href="#" target="_blank" id="bonus-link" class="hidden">
+             <button id="bonus-button-element" class="bonus-button text-gray-800 font-bold py-3 px-8 rounded-lg text-xl w-full">
                 ЗАБРАТЬ ЧЕК
             </button>
         </a>
     </div>
 
     <script>
-        const reel = document.getElementById('reel');
+        const reelElement = document.getElementById('reel');
         const spinButton = document.getElementById('spin-button');
         const resultMessage = document.getElementById('result-message');
         const bonusLink = document.getElementById('bonus-link');
-        const reelContainerWrapper = document.querySelector('.reel-container-wrapper');
+        const bonusButtonElement = document.getElementById('bonus-button-element'); // Получаем саму кнопку
 
-        // Определяем призы
-        const prizes = [
-            { name: '1 TRX' },
-            { name: '0.01 BTC' },
-            { name: '1 TON' },
-            // Ссылка изменена на новую, это единственный целевой приз
-            { name: '0.5 USDT', url: 'https://t.me/testbot1winbot?start=4' },
-            { name: '10 USDT' },
-            { name: '1 USDT' }, // URL убран, т.к. больше не целевой
-            { name: '0.1 ETH' },
-            { name: '5 DOGE' }
-        ];
+        // --- Получение имени бота из URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const botUsernameFromUrl = urlParams.get('bot');
+        const defaultBotUsername = 'testbot1winbot';
+        const botUsername = botUsernameFromUrl || defaultBotUsername;
+        const startParam = '4';
+        console.log(`Используемый бот: ${botUsername}, startParam: ${startParam}`);
+        // --- Конец получения имени бота ---
 
-        const itemHeight = 60; // Высота одного элемента в px (должна совпадать с CSS)
-        const visibleItems = 3; // Сколько элементов примерно видно
-        const reelContainerHeight = itemHeight * visibleItems; // Высота видимой части
+        const basePrizes = [ { name: '1 TRX' }, { name: '0.01 BTC' }, { name: '1 TON' }, { name: '0.5 USDT' }, { name: '10 USDT' }, { name: '1 USDT' }, { name: '0.1 ETH' }, { name: '5 DOGE' } ];
+        const winningPrizeName = '0.5 USDT';
+
+        if (!basePrizes.some(p => p.name === winningPrizeName)) {
+            console.error(`Критическая ошибка: Выигрышный приз "${winningPrizeName}" не найден!`);
+            spinButton.disabled = true; spinButton.textContent = "Ошибка конфигурации";
+        }
+
+        const itemHeight = 60;
+        const visibleItems = 3;
+        const reelContainerHeight = itemHeight * visibleItems;
 
         let isSpinning = false;
         let hasSpun = false;
+        let bonusClaimed = false; // Новый флаг для отслеживания нажатия бонусной кнопки
 
-        // Создаем длинный список призов для эффекта бесконечной прокрутки
-        const repetitions = 5; // Повторяем список призов 5 раз
+        // Ключи localStorage
+        const localStorageKeySpin = 'cryptoReelState_v2';
+        const localStorageKeyClaim = 'cryptoBonusClaimed_v2'; // Новый ключ для флага
+
+        const repetitions = 5;
         let fullPrizeList = [];
-        for (let i = 0; i < repetitions; i++) {
-            fullPrizeList = fullPrizeList.concat(prizes);
-        }
 
-        // Функция для заполнения барабана элементами
-        function populateReel() {
-            reel.innerHTML = ''; // Очищаем барабан
+        function shuffleArray(array) { /* ... (без изменений) ... */
+            let currentIndex = array.length, randomIndex;
+            const newArray = [...array];
+            while (currentIndex > 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [newArray[currentIndex], newArray[randomIndex]] = [
+                    newArray[randomIndex], newArray[currentIndex]];
+            }
+            return newArray;
+         }
+        const ensureWinningPrize = (list, prizeName) => { /* ... (без изменений) ... */
+             const count = list.filter(p => p.name === prizeName).length;
+            const needed = repetitions;
+            if (count < needed) {
+                const prize = basePrizes.find(p => p.name === prizeName);
+                if(prize) {
+                    for(let k=0; k < needed - count; k++) {
+                        const insertIndex = Math.floor(Math.random() * (basePrizes.length * (repetitions - 2))) + basePrizes.length;
+                        list.splice(insertIndex, 0, prize);
+                    }
+                }
+            }
+        };
+        for (let i = 0; i < repetitions; i++) { /* ... (без изменений) ... */
+            const shuffled = shuffleArray(basePrizes);
+            fullPrizeList = fullPrizeList.concat(shuffled);
+        }
+        ensureWinningPrize(fullPrizeList, winningPrizeName);
+
+        function populateReel() { /* ... (без изменений) ... */
+            reelElement.innerHTML = '';
             fullPrizeList.forEach(prize => {
                 const item = document.createElement('div');
                 item.classList.add('reel-item');
                 item.textContent = prize.name;
                 item.dataset.prize = prize.name;
-                reel.appendChild(item);
+                reelElement.appendChild(item);
             });
-        }
+         }
+        function setInitialRandomPosition() { /* ... (без изменений) ... */
+            const randomIndex = Math.floor(Math.random() * basePrizes.length);
+            const randomPrizeName = basePrizes[randomIndex].name;
+            const initialIndex = findMiddlePrizeIndex(randomPrizeName);
 
-        // Функция установки начального случайного положения
-        function setInitialRandomPosition() {
-            const randomIndex = Math.floor(Math.random() * prizes.length);
-            const randomPrizeName = prizes[randomIndex].name;
-            const initialIndex = findMiddlePrizeIndex(randomPrizeName); // Ищем в середине
-
+            reelElement.style.transition = 'none';
             if (initialIndex !== -1) {
-                reel.style.transition = 'none'; // Без анимации
-                reel.style.transform = `translateY(${calculateTranslateY(initialIndex)}px)`;
-                setTimeout(() => {
-                   reel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)';
-                }, 50);
+                reelElement.style.transform = `translateY(${calculateTranslateY(initialIndex)}px)`;
             } else {
-                 console.warn("Не удалось найти случайный начальный индекс, используется индекс 0.");
-                 reel.style.transition = 'none';
-                 reel.style.transform = `translateY(${calculateTranslateY(0)}px)`;
-                 setTimeout(() => {
-                    reel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)';
-                 }, 50);
+                 console.warn(`Не удалось найти случайный начальный индекс для '${randomPrizeName}', используется индекс 0.`);
+                 reelElement.style.transform = `translateY(${calculateTranslateY(0)}px)`;
             }
-        }
+             setTimeout(() => {
+                reelElement.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)';
+             }, 50);
+         }
+        function setWinningPosition() { /* ... (без изменений) ... */
+            const targetIndex = findMiddlePrizeIndex(winningPrizeName);
 
-
-        // Функция инициализации
-        function initializeReel() {
-            populateReel(); // Заполняем барабан
-            const savedState = localStorage.getItem('cryptoReelState');
-
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                hasSpun = state.hasSpun;
-                // Проверяем, что сохраненный выигрыш - это 0.5 USDT
-                if (hasSpun && state.winningPrize && state.winningPrize.name === '0.5 USDT') {
-                    const winningPrize = state.winningPrize;
-                    // Убедимся, что сохраненный URL совпадает с текущим (на случай изменения ссылки)
-                    const currentPrizeData = prizes.find(p => p.name === '0.5 USDT');
-                    if (currentPrizeData) {
-                        winningPrize.url = currentPrizeData.url; // Обновляем URL на всякий случай
-                    }
-
-                    const targetIndex = findMiddlePrizeIndex(winningPrize.name);
-
-                    if (targetIndex !== -1) {
-                        const finalTranslateY = calculateTranslateY(targetIndex);
-                        reel.style.transition = 'none';
-                        reel.style.transform = `translateY(${finalTranslateY}px)`;
-                        setTimeout(() => {
-                           reel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)';
-                        }, 50);
-                        showResult(winningPrize); // Показываем результат 0.5 USDT
-                        spinButton.disabled = true;
-                    } else {
-                         console.error("Не найден индекс для сохраненного приза '0.5 USDT'.");
-                         resetReelState(true);
-                    }
-                } else {
-                    // Сохраненное состояние некорректно или содержит другой выигрыш
-                    resetReelState(true);
-                }
+            reelElement.style.transition = 'none';
+            if (targetIndex !== -1) {
+                reelElement.style.transform = `translateY(${calculateTranslateY(targetIndex)}px)`;
             } else {
-                // Нет сохраненного состояния
-                resetReelState(true);
+                 console.warn(`Не удалось найти выигрышный приз '${winningPrizeName}' в середине списка, используется индекс 0.`);
+                 reelElement.style.transform = `translateY(${calculateTranslateY(0)}px)`;
             }
-        }
-
-        // Функция сброса состояния
-        function resetReelState(setRandomPosition = false) {
-             hasSpun = false;
-             spinButton.disabled = false;
-             resultMessage.textContent = '';
-             bonusLink.classList.add('hidden');
-             localStorage.removeItem('cryptoReelState');
-
-             if (setRandomPosition) {
-                 setInitialRandomPosition();
-             } else {
-                 reel.style.transition = 'none';
-                 reel.style.transform = `translateY(${calculateTranslateY(0)}px)`;
-                 setTimeout(() => {
-                    reel.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)';
-                 }, 50);
+             setTimeout(() => {
+                reelElement.style.transition = 'transform 5s cubic-bezier(0.25, 1, 0.5, 1)';
+             }, 50);
+         }
+        function findMiddlePrizeIndex(prizeName) { /* ... (без изменений) ... */
+             const listToSearch = fullPrizeList;
+             const middleStartIndex = Math.floor(repetitions / 2) * basePrizes.length;
+             const middleEndIndex = middleStartIndex + basePrizes.length;
+             for (let i = middleStartIndex; i < middleEndIndex && i < listToSearch.length; i++) {
+                 if (listToSearch[i].name === prizeName) { return i; }
              }
-        }
-
-        // Функция для поиска индекса приза в средней части списка
-        function findMiddlePrizeIndex(prizeName) {
-             const middleStartIndex = Math.floor(repetitions / 2) * prizes.length;
-             const middleEndIndex = middleStartIndex + prizes.length;
-             for (let i = middleStartIndex; i < middleEndIndex; i++) {
-                 if (fullPrizeList[i].name === prizeName) {
-                     return i;
-                 }
+             console.warn(`Prize '${prizeName}' not found in the middle. Searching entire list.`);
+             for (let i = 0; i < listToSearch.length; i++) {
+                  if (listToSearch[i].name === prizeName) { return i; }
              }
-             console.error(`Prize index not found in the middle for: ${prizeName}`);
+             console.error(`Prize '${prizeName}' not found anywhere in list.`);
              return -1;
-        }
-
-
-        // Функция расчета translateY для центрирования элемента с заданным индексом
-        function calculateTranslateY(index) {
+         }
+        function calculateTranslateY(index) { /* ... (без изменений) ... */
              const targetTopPosition = (reelContainerHeight / 2) - (itemHeight / 2);
              const currentTopPosition = index * itemHeight;
              return targetTopPosition - currentTopPosition;
+         }
+
+        // Обновленная функция инициализации
+        function initializeReel() {
+            populateReel();
+            const savedState = localStorage.getItem(localStorageKey);
+            const savedClaimState = localStorage.getItem(localStorageKeyClaim); // Загружаем флаг нажатия кнопки
+
+            hasSpun = savedState ? JSON.parse(savedState).hasSpun : false;
+            bonusClaimed = savedClaimState === 'true'; // Устанавливаем флаг
+
+            if (hasSpun) {
+                 setWinningPosition();
+                 showResult(bonusClaimed); // Передаем флаг в showResult
+                 spinButton.disabled = true;
+                 // Если бонус уже был забран, сразу блокируем кнопку и показываем полный текст
+                 if (bonusClaimed) {
+                     resultMessage.innerHTML = 'Вы выиграли: 0.5 USDT!<br>За выигрышем вернитесь в бота.'; // Сразу полный текст
+                     bonusButtonElement.disabled = true;
+                 }
+            } else {
+                 setInitialRandomPosition();
+                 resultMessage.innerHTML = '';
+                 bonusLink.classList.add('hidden');
+                 spinButton.disabled = false;
+                 bonusButtonElement.disabled = false; // Убедимся, что кнопка бонуса активна при старте
+            }
         }
 
-        // Функция отображения результата
-        function showResult(prize) {
-            // Показываем результат только если это 0.5 USDT
-            if (prize.name !== '0.5 USDT') {
-                console.error("Попытка показать неверный результат:", prize);
-                resetReelState(true); // Сброс в случае ошибки
-                return;
-            }
-            resultMessage.textContent = `Вы выиграли: ${prize.name}!`;
-            // Устанавливаем правильную ссылку и показываем кнопку
-            const currentPrizeData = prizes.find(p => p.name === '0.5 USDT');
-            if (currentPrizeData && currentPrizeData.url) {
-                 bonusLink.href = currentPrizeData.url; // Используем актуальный URL
-                 bonusLink.classList.remove('hidden');
-            } else {
-                 console.error("Не найден URL для приза 0.5 USDT");
-                 bonusLink.classList.add('hidden'); // Скрыть кнопку, если URL не найден
-            }
+        // Обновленная функция сброса состояния
+        function resetReelState() {
+             hasSpun = false;
+             bonusClaimed = false; // Сбрасываем флаг
+             spinButton.disabled = false;
+             resultMessage.innerHTML = '';
+             bonusLink.classList.add('hidden');
+             bonusButtonElement.disabled = false; // Делаем кнопку активной
+             localStorage.removeItem(localStorageKey);
+             localStorage.removeItem(localStorageKeyClaim); // Удаляем флаг
+             setInitialRandomPosition();
+        }
 
+
+        // Обновленная функция отображения результата
+        function showResult(isBonusAlreadyClaimed = false) {
+            // Показываем только первую часть сообщения изначально
+            resultMessage.innerHTML = 'Вы выиграли: 0.5 USDT!';
+
+            // Формируем и устанавливаем ДИНАМИЧЕСКУЮ ссылку
+            const telegramLink = `https://t.me/${botUsername}?start=${startParam}`;
+            bonusLink.href = telegramLink;
+            bonusLink.classList.remove('hidden'); // Показываем контейнер ссылки (и кнопку внутри)
+
+            // Блокируем кнопку спина
             spinButton.disabled = true;
             hasSpun = true;
 
-            // Сохраняем состояние (только 0.5 USDT)
-            const stateToSave = {
-                hasSpun: true,
-                winningPrize: { name: prize.name, url: bonusLink.href } // Сохраняем с актуальным URL
-            };
-            localStorage.setItem('cryptoReelState', JSON.stringify(stateToSave));
+            // Сохраняем только факт спина (флаг нажатия бонуса сохраняется отдельно)
+            const stateToSave = { hasSpun: true };
+            localStorage.setItem(localStorageKey, JSON.stringify(stateToSave));
+
+            // Кнопка бонуса активна, если бонус еще не забран
+            bonusButtonElement.disabled = isBonusAlreadyClaimed;
         }
 
-        // Обработчик клика по кнопке
+        // Обработчик клика по кнопке "КРУТИТЬ" (логика не изменилась)
         spinButton.addEventListener('click', () => {
+            if (!basePrizes.some(p => p.name === winningPrizeName)) {
+                 resultMessage.textContent = 'Ошибка конфигурации призов!';
+                 return;
+            }
             if (isSpinning || hasSpun) return;
 
             isSpinning = true;
@@ -309,48 +323,48 @@
             resultMessage.textContent = 'Вращаем...';
             bonusLink.classList.add('hidden');
 
-            // 1. Устанавливаем целевой приз: всегда 0.5 USDT
-            const finalPrize = prizes.find(p => p.name === '0.5 USDT');
-            if (!finalPrize) {
-                console.error("Критическая ошибка: Приз '0.5 USDT' не найден в массиве prizes!");
-                isSpinning = false;
-                resultMessage.textContent = 'Ошибка конфигурации!';
-                return;
-            }
-
-
-            // 2. Находим индекс этого приза в СРЕДНЕЙ части списка
-            const targetIndex = findMiddlePrizeIndex(finalPrize.name);
+            const targetIndex = findMiddlePrizeIndex(winningPrizeName);
             if (targetIndex === -1) {
-                 console.error(`Не удалось найти индекс '${finalPrize.name}' в середине списка!`);
+                 console.error(`Не удалось найти индекс '${winningPrizeName}'!`);
                  isSpinning = false;
-                 resultMessage.textContent = 'Ошибка!';
+                 resultMessage.textContent = 'Ошибка при поиске приза!';
                  return;
             }
-
-            // 3. Рассчитываем конечную позицию translateY
             const finalTranslateY = calculateTranslateY(targetIndex);
 
-            // 4. Анимация
-            const randomExtraScroll = Math.floor(Math.random() * prizes.length) * itemHeight;
-            const initialFastScrollY = finalTranslateY - (prizes.length * itemHeight * Math.max(2, Math.floor(repetitions/2))) - randomExtraScroll;
+            const randomExtraScroll = Math.floor(Math.random() * basePrizes.length) * itemHeight;
+            const initialFastScrollY = finalTranslateY - (basePrizes.length * itemHeight * Math.max(2, Math.floor(repetitions/2))) - randomExtraScroll;
 
-            reel.style.transition = 'transform 0.5s ease-out';
-            reel.style.transform = `translateY(${initialFastScrollY}px)`;
+            reelElement.style.transition = 'transform 0.5s ease-out';
+            reelElement.style.transform = `translateY(${initialFastScrollY}px)`;
 
             setTimeout(() => {
-                reel.style.transition = 'transform 4.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                reel.style.transform = `translateY(${finalTranslateY}px)`;
+                reelElement.style.transition = 'transform 4.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                reelElement.style.transform = `translateY(${finalTranslateY}px)`;
             }, 500);
 
-
-            // 5. Показываем результат после завершения анимации
             setTimeout(() => {
                 isSpinning = false;
-                showResult(finalPrize); // Показываем всегда 0.5 USDT
+                showResult(false); // Показываем результат, бонус еще не забран
                 spinButton.disabled = true;
             }, 5000);
         });
+
+        // --- Новый обработчик для кнопки "ЗАБРАТЬ ЧЕК" ---
+        bonusButtonElement.addEventListener('click', () => {
+            if (bonusClaimed) return; // Не делать ничего, если уже нажата
+
+            // Добавляем вторую часть сообщения
+            resultMessage.innerHTML += '<br>За выигрышем вернитесь в бота.'; // Используем innerHTML для <br>
+
+            // Блокируем кнопку
+            bonusButtonElement.disabled = true;
+            bonusClaimed = true;
+
+            // Сохраняем состояние нажатой кнопки
+            localStorage.setItem(localStorageKeyClaim, bonusClaimed);
+        });
+
 
         // Инициализация при загрузке
         initializeReel();
